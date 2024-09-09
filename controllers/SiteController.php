@@ -5,6 +5,7 @@ namespace app\controllers;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
+use yii\web\NotFoundHttpException;
 use yii\web\Response;
 use yii\filters\VerbFilter;
 use app\models\LoginForm;
@@ -44,9 +45,9 @@ class SiteController extends Controller
     public function actions()
     {
         return [
-            'error' => [
+            /*'error' => [
                 'class' => 'yii\web\ErrorAction',
-            ],
+            ],*/
             'captcha' => [
                 'class' => 'yii\captcha\CaptchaAction',
                 'fixedVerifyCode' => YII_ENV_TEST ? 'testme' : null,
@@ -124,5 +125,29 @@ class SiteController extends Controller
     public function actionAbout()
     {
         return $this->render('about');
+    }
+
+    /**
+     * @return Response
+     */
+    public function actionError()
+    {
+        if (($exception = Yii::$app->getErrorHandler()->exception) === null) {
+            $exception = new NotFoundHttpException(Yii::t('yii', 'Page not found.'));
+        }
+
+        if ($exception instanceof \HttpException) {
+            Yii::$app->response->setStatusCode($exception->getCode());
+        } else {
+            Yii::$app->response->setStatusCode(500);
+        }
+
+        //Yii::$app->response->setStatusCode(200);
+
+        return $this->asJson([
+            'status' => 'error',
+            'code' => /*403,*/ $exception->getCode(),
+            'message' => /*'Invalid token',*/ $exception->getMessage(),
+        ]);
     }
 }

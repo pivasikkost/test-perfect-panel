@@ -1,233 +1,140 @@
+Задание 1, SQL
+------------
+Запрос выборки данных из представленных таблиц, который найдет и выведет всех посетителей библиотеки, возраст которых попадает в диапазон от 7 и до 17 лет, которые  взяли две книги одного автора (взяли всего 2 книги и они одного автора), книги были у них в руках не более двух календарных недель (не просрочили 2-х недельный срок пользования)
+~~~
+SELECT
+    u.id as ID,
+    CONCAT_WS(' ', u.first_name, u.last_name) as Name,
+    b.author as Author,
+    GROUP_CONCAT(DISTINCT b.name ORDER BY b.name SEPARATOR ', ') as Books
+FROM user_books ub
+INNER JOIN books b
+  ON ub.book_id = b.id
+INNER JOIN users u
+  ON ub.user_id = u.id
+WHERE
+  user_id IN (
+    SELECT user_id
+    FROM user_books ub1
+    GROUP BY ub1.user_id
+    HAVING COUNT(DISTINCT book_id) = 2
+  ) -- users with 2 books
+  AND TIMESTAMPDIFF(YEAR, u.birthday, CURRENT_DATE) BETWEEN 7 AND 17
+  AND TIMESTAMPDIFF(DAY, ub.get_date, CURRENT_DATE) <= 14
+GROUP BY ub.user_id , b.author
+HAVING COUNT(DISTINCT book_id) = 2
+;
+~~~
+
+Если имелось в виду, не сейчас взявшие и не сдавшие за 2 недели, а когда-либо бравшие и возвращавшие меньше чем через 2 недели, то нужно просто заменить в этом запросе константу CURRENT_DATE во втором случае на ub.return_date
+
 <p align="center">
     <a href="https://github.com/yiisoft" target="_blank">
         <img src="https://avatars0.githubusercontent.com/u/993323" height="100px">
     </a>
-    <h1 align="center">Yii 2 Basic Project Template</h1>
+    <h1 align="center">Задание 2, тестовый проект, основанный на Yii 2</h1>
     <br>
 </p>
 
-Yii 2 Basic Project Template is a skeleton [Yii 2](https://www.yiiframework.com/) application best for
-rapidly creating small projects.
-
-The template contains the basic features including user login/logout and a contact page.
-It includes all commonly used configurations that would allow you to focus on adding new
-features to your application.
-
-[![Latest Stable Version](https://img.shields.io/packagist/v/yiisoft/yii2-app-basic.svg)](https://packagist.org/packages/yiisoft/yii2-app-basic)
-[![Total Downloads](https://img.shields.io/packagist/dt/yiisoft/yii2-app-basic.svg)](https://packagist.org/packages/yiisoft/yii2-app-basic)
-[![build](https://github.com/yiisoft/yii2-app-basic/workflows/build/badge.svg)](https://github.com/yiisoft/yii2-app-basic/actions?query=workflow%3Abuild)
-
-DIRECTORY STRUCTURE
--------------------
-
-      assets/             contains assets definition
-      commands/           contains console commands (controllers)
-      config/             contains application configurations
-      controllers/        contains Web controller classes
-      mail/               contains view files for e-mails
-      models/             contains model classes
-      runtime/            contains files generated during runtime
-      tests/              contains various tests for the basic application
-      vendor/             contains dependent 3rd-party packages
-      views/              contains view files for the Web application
-      web/                contains the entry script and Web resources
-
-
-
-REQUIREMENTS
+ТРЕБОВАНИЯ
 ------------
+Минимальное требование этого проекта — поддержка вашим веб-сервером PHP 8.0.
 
-The minimum requirement by this project template that your Web server supports PHP 7.4.
-
-
-INSTALLATION
+УСТАНОВКА
 ------------
+### Клонировать репозиторий
 
-### Install via Composer
-
-If you do not have [Composer](https://getcomposer.org/), you may install it by following the instructions
-at [getcomposer.org](https://getcomposer.org/doc/00-intro.md#installation-nix).
-
-You can then install this project template using the following command:
+Сначала вам нужно клонировать репозиторий этого проекта:
 
 ~~~
-composer create-project --prefer-dist yiisoft/yii2-app-basic basic
+git clone https://github.com/pivasikkost/test-case-zinchenko <target folder>
 ~~~
 
-Now you should be able to access the application through the following URL, assuming `basic` is the directory
-directly under the Web root.
+###Установка с помощью Docker и Composer
 
-~~~
-http://localhost/basic/web/
-~~~
+Если у вас нет [Composer](https://getcomposer.org/), вы можете установить его, следуя инструкциям
+на [getcomposer.org](https://getcomposer.org/doc/00-intro.md#installation-nix).
 
-### Install from an Archive File
+Некоторые файлы проекта отсутствуют в репозитории, чтобы установить их, перейдите в каталог проекта и выполните команды:
 
-Extract the archive file downloaded from [yiiframework.com](https://www.yiiframework.com/download/) to
-a directory named `basic` that is directly under the Web root.
-
-Set cookie validation key in `config/web.php` file to some random secret string:
-
-```php
-'request' => [
-    // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
-    'cookieValidationKey' => '<secret random string goes here>',
-],
-```
-
-You can then access the application through the following URL:
-
-~~~
-http://localhost/basic/web/
-~~~
-
-
-### Install with Docker
-
-Update your vendor packages
+Обновите пакеты поставщиков
 
     docker-compose run --rm php composer update --prefer-dist
-    
-Run the installation triggers (creating cookie validation code)
+
+апустите триггеры установки (создание кода проверки файлов cookie)
 
     docker-compose run --rm php composer install    
-    
-Start the container
+
+Запустите контейнер
 
     docker-compose up -d
-    
-You can then access the application through the following URL:
+
+Приложение будет доступно по адресам:
 
     http://127.0.0.1:8000
+    http://localhost:8000
 
-**NOTES:** 
-- Minimum required Docker engine version `17.04` for development (see [Performance tuning for volume mounts](https://docs.docker.com/docker-for-mac/osxfs-caching/))
-- The default configuration uses a host-volume in your home directory `.docker-composer` for composer caches
+Bearer токен для авторизации:
+~~~
+080042cad6356ad5dc0a720c18b53b8e53d4c274
+~~~
 
+**ПРИМЕЧАНИЯ:**
+- Минимально необходимая версия движка Docker `17.04` для разработки (см. [Настройка производительности для монтирования томов](https://docs.docker.com/docker-for-mac/osxfs-caching/))
+- Конфигурация по умолчанию использует хост-том в вашем домашнем каталоге `.docker-composer` для кэшей Composer
 
-CONFIGURATION
+ТЕСТИРОВАНИЕ
 -------------
 
-### Database
-
-Edit the file `config/db.php` with real data, for example:
-
-```php
-return [
-    'class' => 'yii\db\Connection',
-    'dsn' => 'mysql:host=localhost;dbname=yii2basic',
-    'username' => 'root',
-    'password' => '1234',
-    'charset' => 'utf8',
-];
-```
-
-**NOTES:**
-- Yii won't create the database for you, this has to be done manually before you can access it.
-- Check and edit the other files in the `config/` directory to customize your application as required.
-- Refer to the README in the `tests` directory for information specific to basic application tests.
+### Метод rates
 
 
-TESTING
--------
+Из консоли отправьте следующий запрос
+~~~
+curl -i -H "Accept:application/json" -H "Authorization: Bearer 080042cad6356ad5dc0a720c18b53b8e53d4c274" "http://localhost:8000/v1/currency-exchange/rates?currency=BTC"
+~~~
+Получите ответ
+~~~
+HTTP/1.1 200 OK
+Date: Mon, 09 Sep 2024 10:50:52 GMT
+Server: Apache/2.4.56 (Debian)
+Vary: Accept
+X-Debug-Tag: 66ded30c996e8
+X-Debug-Duration: 866
+X-Debug-Link: /debug/default/view?tag=66ded30c996e8
+Set-Cookie: _csrf=b83cb5c64d950ec4ca7b1d68896eeb23b86862b480eadda1ac67fafafd595b8da%3A2%3A%7Bi%3A0%3Bs%3A5%3A%22_csrf%22%3Bi%3A1%3Bs%3A32%3A%22TmTxUUpoOyBUOJLr06gcvJepC4G9AaGC%22%3B%7D; path=/; HttpOnly; SameSite=Lax
+Content-Length: 32
+Content-Type: application/json; charset=UTF-8
+{
+"BTC": 54334.25987123895
+}
+~~~
+Сделайте то же самое только без currency параметра и используя проверку разных правил валидации
 
-Tests are located in `tests` directory. They are developed with [Codeception PHP Testing Framework](https://codeception.com/).
-By default, there are 3 test suites:
+### Метод convert
+Из консоли отправьте следующий запрос
+~~~
+curl -i -X POST -H "Authorization: Bearer 080042cad6356ad5dc0a720c18b53b8e53d4c274" -d 'currency_from=BTC&currency_to=USD&value=0.01' "http://localhost:8000/v1/currency-exchange/convert"
+~~~
+Получите ответ
+~~~
+HTTP/1.1 200 OK
+Date: Mon, 09 Sep 2024 11:00:21 GMT
+Server: Apache/2.4.56 (Debian)
+Vary: Accept
+X-Debug-Tag: 66ded5456ed86
+X-Debug-Duration: 794
+X-Debug-Link: /debug/default/view?tag=66ded5456ed86
+Set-Cookie: _csrf=1b510ee9f28ade5f06f75016a898ba41a9101f30d1e69890c2d1f49c518dafdea%3A2%3A%7Bi%3A0%3Bs%3A5%3A%22_csrf%22%3Bi%3A1%3Bs%3A32%3A%224jVzTT7lkgjkCXIhQqya441d6CF78euS%22%3B%7D; path=/; HttpOnly; SameSite=Lax
+Content-Length: 137
+Content-Type: application/json; charset=UTF-8
 
-- `unit`
-- `functional`
-- `acceptance`
-
-Tests can be executed by running
-
-```
-vendor/bin/codecept run
-```
-
-The command above will execute unit and functional tests. Unit tests are testing the system components, while functional
-tests are for testing user interaction. Acceptance tests are disabled by default as they require additional setup since
-they perform testing in real browser. 
-
-
-### Running  acceptance tests
-
-To execute acceptance tests do the following:  
-
-1. Rename `tests/acceptance.suite.yml.example` to `tests/acceptance.suite.yml` to enable suite configuration
-
-2. Replace `codeception/base` package in `composer.json` with `codeception/codeception` to install full-featured
-   version of Codeception
-
-3. Update dependencies with Composer 
-
-    ```
-    composer update  
-    ```
-
-4. Download [Selenium Server](https://www.seleniumhq.org/download/) and launch it:
-
-    ```
-    java -jar ~/selenium-server-standalone-x.xx.x.jar
-    ```
-
-    In case of using Selenium Server 3.0 with Firefox browser since v48 or Google Chrome since v53 you must download [GeckoDriver](https://github.com/mozilla/geckodriver/releases) or [ChromeDriver](https://sites.google.com/a/chromium.org/chromedriver/downloads) and launch Selenium with it:
-
-    ```
-    # for Firefox
-    java -jar -Dwebdriver.gecko.driver=~/geckodriver ~/selenium-server-standalone-3.xx.x.jar
-    
-    # for Google Chrome
-    java -jar -Dwebdriver.chrome.driver=~/chromedriver ~/selenium-server-standalone-3.xx.x.jar
-    ``` 
-    
-    As an alternative way you can use already configured Docker container with older versions of Selenium and Firefox:
-    
-    ```
-    docker run --net=host selenium/standalone-firefox:2.53.0
-    ```
-
-5. (Optional) Create `yii2basic_test` database and update it by applying migrations if you have them.
-
-   ```
-   tests/bin/yii migrate
-   ```
-
-   The database configuration can be found at `config/test_db.php`.
-
-
-6. Start web server:
-
-    ```
-    tests/bin/yii serve
-    ```
-
-7. Now you can run all available tests
-
-   ```
-   # run all available tests
-   vendor/bin/codecept run
-
-   # run acceptance tests
-   vendor/bin/codecept run acceptance
-
-   # run only unit and functional tests
-   vendor/bin/codecept run unit,functional
-   ```
-
-### Code coverage support
-
-By default, code coverage is disabled in `codeception.yml` configuration file, you should uncomment needed rows to be able
-to collect code coverage. You can run your tests and collect coverage with the following command:
-
-```
-#collect coverage for all tests
-vendor/bin/codecept run --coverage --coverage-html --coverage-xml
-
-#collect coverage only for unit tests
-vendor/bin/codecept run unit --coverage --coverage-html --coverage-xml
-
-#collect coverage for unit and functional tests
-vendor/bin/codecept run functional,unit --coverage --coverage-html --coverage-xml
-```
-
-You can see code coverage output under the `tests/_output` directory.
+{
+    "currency_from": "BTC",
+    "currency_to": "USD",
+    "value": 0.01,
+    "converted_value": 543.1,
+    "rate": 54309.594394244836
+}
+~~~
+Сделайте то же самое только используя проверку разных комбинаций параметров

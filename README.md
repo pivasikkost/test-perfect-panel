@@ -49,10 +49,10 @@ HAVING COUNT(DISTINCT book_id) = 2
 Сначала вам нужно клонировать репозиторий этого проекта:
 
 ~~~
-git clone https://github.com/pivasikkost/test-case-zinchenko <target folder>
+git clone https://github.com/pivasikkost/test-perfect-panel <target folder>
 ~~~
 
-###Установка с помощью Docker и Composer
+### Установка с помощью Docker и Composer
 
 Если у вас нет [Composer](https://getcomposer.org/), вы можете установить его, следуя инструкциям
 на [getcomposer.org](https://getcomposer.org/doc/00-intro.md#installation-nix).

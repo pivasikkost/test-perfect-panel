@@ -108,7 +108,11 @@ Set-Cookie: _csrf=b83cb5c64d950ec4ca7b1d68896eeb23b86862b480eadda1ac67fafafd595b
 Content-Length: 32
 Content-Type: application/json; charset=UTF-8
 {
-"BTC": 54334.25987123895
+    "status": "success",
+    "code": 200,
+    "data": {
+        "BTC": 54334.25987123895
+    }
 }
 ~~~
 Сделайте то же самое только без currency параметра и используя проверку разных правил валидации
@@ -130,13 +134,16 @@ X-Debug-Link: /debug/default/view?tag=66ded5456ed86
 Set-Cookie: _csrf=1b510ee9f28ade5f06f75016a898ba41a9101f30d1e69890c2d1f49c518dafdea%3A2%3A%7Bi%3A0%3Bs%3A5%3A%22_csrf%22%3Bi%3A1%3Bs%3A32%3A%224jVzTT7lkgjkCXIhQqya441d6CF78euS%22%3B%7D; path=/; HttpOnly; SameSite=Lax
 Content-Length: 137
 Content-Type: application/json; charset=UTF-8
-
 {
-    "currency_from": "BTC",
-    "currency_to": "USD",
-    "value": 0.01,
-    "converted_value": 543.1,
-    "rate": 54309.594394244836
+    "status": "success",
+    "code": 200,
+    "data": {
+        "currency_from": "BTC",
+        "currency_to": "USD",
+        "value": 0.01,
+        "converted_value": 543.1,
+        "rate": 54309.594394244836
+    }
 }
 ~~~
 Сделайте то же самое только используя проверку разных комбинаций параметров

@@ -136,11 +136,7 @@ class SiteController extends Controller
             $exception = new NotFoundHttpException(Yii::t('yii', 'Page not found.'));
         }
 
-        if ($exception instanceof \HttpException) {
-            Yii::$app->response->setStatusCode($exception->getCode());
-        } else {
-            Yii::$app->response->setStatusCode(500);
-        }
+        Yii::$app->response->setStatusCodeByException($exception);
 
         //Yii::$app->response->setStatusCode(200);
 
